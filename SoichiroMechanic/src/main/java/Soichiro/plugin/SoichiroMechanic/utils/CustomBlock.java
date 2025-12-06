@@ -1,3 +1,8 @@
+/*
+ * SoichiroMechanic - カスタムブロックユーティリティ
+ * CustomBlock は特定位置にブロックを設置/管理する簡易ラッパーです。
+ * 作者: soichiro0520
+ */
 package Soichiro.plugin.SoichiroMechanic.utils;
 
 import org.bukkit.Location;
@@ -5,9 +10,13 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 public class CustomBlock {
+    // ブロックの設置場所
     private Location location;
+    // 使用するブロックの種類（Material）
     private Material baseMaterial;
+    // プラグイン上で扱うための任意の名前
     private String customName;
+    // 追加データを文字列で保持するためのフィールド（用途は拡張可能）
     private String customData;
 
     public CustomBlock(Location location, Material baseMaterial, String customName, String customData) {
@@ -18,6 +27,7 @@ public class CustomBlock {
     }
 
     public Location getLocation() {
+        // 設置場所を返す
         return location;
     }
 
@@ -26,6 +36,7 @@ public class CustomBlock {
     }
 
     public Material getBaseMaterial() {
+        // このカスタムブロックに使用する Material を返す
         return baseMaterial;
     }
 
@@ -50,6 +61,7 @@ public class CustomBlock {
     }
 
     public Block getBlock() {
+        // Location から Bukkit の Block オブジェクトを取得する
         return location != null ? location.getBlock() : null;
     }
 
@@ -57,12 +69,14 @@ public class CustomBlock {
         if (location == null || baseMaterial == null) {
             return false;
         }
+        // ワールド上にブロックを設置する（単純にタイプを変更）
         getBlock().setType(baseMaterial);
         return true;
     }
 
     public void remove() {
         if (location != null) {
+            // ブロックを空気にして削除する
             getBlock().setType(Material.AIR);
         }
     }

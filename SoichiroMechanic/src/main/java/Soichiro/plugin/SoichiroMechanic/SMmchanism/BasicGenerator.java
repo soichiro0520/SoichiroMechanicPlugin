@@ -1,3 +1,8 @@
+/*
+ * SoichiroMechanic - 基本ジェネレータクラス
+ * BasicGenerator は燃料を消費して電力を生成するシンプルなジェネレータ実装です。
+ * 作者: soichiro0520
+ */
 package Soichiro.plugin.SoichiroMechanic.SMmchanism;
 
 import org.bukkit.Location;
@@ -6,13 +11,21 @@ import org.bukkit.Material;
 import Soichiro.plugin.SoichiroMechanic.utils.CustomBlock;
 
 public class BasicGenerator {
+    // ジェネレータを表すカスタムブロック
     private CustomBlock generatorBlock;
+    // 現在の出力
     private int powerOutput;
+    // 燃料種別ごとの最大出力
     private int maxPowerOutput;
+    // 実行中フラグ
     private boolean isRunning;
+    // 使用する燃料タイプ
     private GeneratorFuel fuelType;
+    // 現在の燃料量
     private int fuelLevel;
+    // 最大燃料量
     private int maxFuelLevel;
+    // 最終更新時間（ミリ秒） - update() の経過時間計算に使用
     private long lastUpdateTime;
 
     public enum GeneratorFuel {
@@ -24,6 +37,8 @@ public class BasicGenerator {
         private final int powerPerSecond;
         private final int maxFuel;
 
+        // powerPerSecond: 1秒あたりの発電量（任意単位）
+        // maxFuel: 燃料の最大値（ジェネレータに入る量の上限）
         GeneratorFuel(int powerPerSecond, int maxFuel) {
             this.powerPerSecond = powerPerSecond;
             this.maxFuel = maxFuel;
@@ -51,13 +66,16 @@ public class BasicGenerator {
     }
 
     public void addFuel(int amount) {
+        // 太陽光タイプは燃料不要のため無視
         if (fuelType == GeneratorFuel.SOLAR) {
             return;
         }
+        // 燃料を追加（上限を超えないようにする）
         fuelLevel = Math.min(fuelLevel + amount, maxFuelLevel);
     }
 
     public void start() {
+        // 燃料があるか、または太陽光発電の場合に起動する
         if ((fuelLevel > 0 || fuelType == GeneratorFuel.SOLAR) && !isRunning) {
             isRunning = true;
             lastUpdateTime = System.currentTimeMillis();
@@ -70,6 +88,7 @@ public class BasicGenerator {
     }
 
     public void update() {
+        // 定期的に呼び出して発電/燃料消費を計算する
         if (!isRunning) {
             return;
         }
@@ -79,14 +98,17 @@ public class BasicGenerator {
         lastUpdateTime = currentTime;
 
         if (fuelType == GeneratorFuel.SOLAR) {
+            // 太陽光は燃料を消費せず、常に最大出力を返す想定
             powerOutput = maxPowerOutput;
         } else {
             if (fuelLevel > 0) {
+                // 秒数に応じて燃料を消費
                 int fuelConsumed = (int) (deltaTime / 1000.0);
                 fuelLevel = Math.max(fuelLevel - fuelConsumed, 0);
                 powerOutput = maxPowerOutput;
 
                 if (fuelLevel <= 0) {
+                    // 燃料切れで停止
                     stop();
                 }
             } else {

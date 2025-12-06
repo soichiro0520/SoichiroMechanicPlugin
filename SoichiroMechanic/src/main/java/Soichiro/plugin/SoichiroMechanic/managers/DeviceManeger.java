@@ -1,3 +1,8 @@
+/*
+ * SoichiroMechanic - デバイス管理クラス
+ * DeviceManeger は複数の発電メカニズムを作成・管理するユーティリティです。
+ * 作者: soichiro0520
+ */
 package Soichiro.plugin.SoichiroMechanic.managers;
 
 import java.util.HashMap;
@@ -9,7 +14,9 @@ import org.bukkit.World;
 import Soichiro.plugin.SoichiroMechanic.SMmchanism.GenerateMechanism;
 
 public class DeviceManeger {
+    // ID をキーに複数の GenerateMechanism を管理するマップ
     private Map<String, GenerateMechanism> mechanisms;
+    // 各メカニズムの設定情報を保持するマップ
     private Map<String, SystemConfig> systemConfigs;
 
     public DeviceManeger() {
@@ -18,6 +25,7 @@ public class DeviceManeger {
     }
 
     public void createMechanism(String id, World world) {
+        // 新しいメカニズムを作成して登録する
         GenerateMechanism mechanism = new GenerateMechanism(world);
         mechanisms.put(id, mechanism);
         systemConfigs.put(id, new SystemConfig());
@@ -30,6 +38,7 @@ public class DeviceManeger {
     public void removeMechanism(String id) {
         GenerateMechanism mechanism = mechanisms.get(id);
         if (mechanism != null) {
+            // 削除前に設置したブロックをすべてクリアする
             mechanism.clearAllBlocks();
             mechanisms.remove(id);
             systemConfigs.remove(id);
@@ -39,6 +48,7 @@ public class DeviceManeger {
     public void activateMechanism(String id, int powerInput) {
         GenerateMechanism mechanism = mechanisms.get(id);
         if (mechanism != null) {
+            // 指定したメカニズムを指定電力で起動する
             mechanism.activateSystem(powerInput);
             SystemConfig config = systemConfigs.get(id);
             if (config != null) {
@@ -61,6 +71,7 @@ public class DeviceManeger {
     public void addDeviceToMechanism(String mechanismId, Location location, String deviceType, int powerConsumption) {
         GenerateMechanism mechanism = mechanisms.get(mechanismId);
         if (mechanism != null) {
+            // 指定したメカニズムにデバイスを追加する
             mechanism.addDevice(location, deviceType, powerConsumption);
         }
     }
@@ -87,6 +98,7 @@ public class DeviceManeger {
     }
 
     public void clearAllMechanisms() {
+        // すべてのメカニズムをクリアしてマップを初期化する
         mechanisms.values().forEach(GenerateMechanism::clearAllBlocks);
         mechanisms.clear();
         systemConfigs.clear();

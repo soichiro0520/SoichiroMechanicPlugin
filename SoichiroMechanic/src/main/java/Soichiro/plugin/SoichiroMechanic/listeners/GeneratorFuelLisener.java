@@ -1,3 +1,8 @@
+/*
+ * SoichiroMechanic - ジェネレータ燃料リスナー
+ * プレイヤーの右クリック操作でジェネレータに燃料を入れたり起動/停止を行います。
+ * 作者: soichiro0520
+ */
 package Soichiro.plugin.SoichiroMechanic.listeners;
 
 import java.util.HashMap;
@@ -18,7 +23,9 @@ import Soichiro.plugin.SoichiroMechanic.SMmchanism.BasicGenerator;
 import Soichiro.plugin.SoichiroMechanic.SMmchanism.BasicGenerator.GeneratorFuel;
 
 public class GeneratorFuelLisener implements Listener {
+    // プレイヤーごとに所有するジェネレータを紐付けるためのマップ
     private Map<UUID, BasicGenerator> generatorMap;
+    // ワールド上のロケーションからジェネレータを検索するためのマップ
     private Map<Location, BasicGenerator> generatorLocationMap;
 
     public GeneratorFuelLisener() {
@@ -27,6 +34,7 @@ public class GeneratorFuelLisener implements Listener {
     }
 
     public void registerGenerator(BasicGenerator generator, Player owner) {
+        // 所有者と位置で登録することで、右クリック時に generator を特定できる
         generatorMap.put(owner.getUniqueId(), generator);
         generatorLocationMap.put(generator.getGeneratorBlock().getLocation(), generator);
     }
@@ -40,6 +48,7 @@ public class GeneratorFuelLisener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        // プレイヤーがジェネレータブロックを右クリックしたときの処理
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
@@ -49,6 +58,7 @@ public class GeneratorFuelLisener implements Listener {
             return;
         }
 
+        // クリックした位置がジェネレータであれば操作を処理する
         BasicGenerator generator = generatorLocationMap.get(clickedBlock.getLocation());
         if (generator == null) {
             return;
@@ -57,12 +67,14 @@ public class GeneratorFuelLisener implements Listener {
         Player player = event.getPlayer();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
+        // 素手（空手）で右クリックした場合は起動/停止トグル
         if (itemInHand.getType() == Material.AIR) {
             handleGeneratorInteraction(player, generator);
             event.setCancelled(true);
             return;
         }
 
+        // 燃料アイテムであれば燃料を追加
         if (isFuelItem(itemInHand, generator.getFuelType())) {
             addFuelToGenerator(player, generator, itemInHand);
             event.setCancelled(true);
@@ -97,6 +109,7 @@ public class GeneratorFuelLisener implements Listener {
             return;
         }
 
+        // ジェネレータに燃料を追加し、インベントリのアイテム数を減らす
         generator.addFuel(fuelAmount);
         fuelItem.setAmount(fuelItem.getAmount() - 1);
 
@@ -120,11 +133,12 @@ public class GeneratorFuelLisener implements Listener {
     }
 
     private boolean isFuelItem(ItemStack item, GeneratorFuel fuelType) {
+        // 指定した燃料タイプに対応するアイテムか判定する
         return switch (fuelType) {
             case COAL -> item.getType() == Material.COAL;
             case REDSTONE -> item.getType() == Material.REDSTONE;
             case LAVA -> item.getType() == Material.LAVA_BUCKET;
-            case SOLAR -> false;
+            case SOLAR -> false; // 太陽光はアイテムで追加できない
         };
     }
 
