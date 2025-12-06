@@ -1,0 +1,2 @@
+# SoichiroMechanicPlugin
+手探りだらけの工業化プラグイン
