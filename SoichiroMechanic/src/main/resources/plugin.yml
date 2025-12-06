@@ -1,0 +1,5 @@
+main: Soichiro.plugin.SoichiroMechanic.SoichiroMechanic
+version: 1.0.0-SNAPSHOT
+name: SoichiroMechanic
+author: soichiro0520
+api-version: 1.21
